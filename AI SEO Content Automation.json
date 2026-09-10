@@ -1,0 +1,229 @@
+{
+  "name": "AI SEO Content Automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "02ffbd76-e7b2-4131-98d2-1e5c125f7569",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cecd62e3-d4c6-4d1d-bffd-5ce74cb8c819",
+              "name": "keyword",
+              "value": "AI Automation for Small Businesses",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "5e939a41-0663-49b8-a350-c15089c4ca2d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "02322252-4335-4f08-982b-cf794c69879e",
+      "name": "When chat message received",
+      "webhookId": "0c87133c-1540-4193-b214-cf7f402922e2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write 5 SEO-optimized blog titles for the topic: {{$json.topic}}\nEach title should be 50-60 characters, include the main keyword, and be compelling to click.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        832,
+        0
+      ],
+      "id": "a1e6a1c0-e7d0-448b-aff5-50a602faa842",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        192
+      ],
+      "id": "ddb34785-a034-49ea-9fc2-8d67b0285495",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IuGpPIVfJl7iPX50",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NeXS26SO5eIkKN2Meu0xqurVRuCLLLl-Z6QFGgGn3NA",
+          "mode": "list",
+          "cachedResultName": "AI SEO Content Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NeXS26SO5eIkKN2Meu0xqurVRuCLLLl-Z6QFGgGn3NA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NeXS26SO5eIkKN2Meu0xqurVRuCLLLl-Z6QFGgGn3NA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{$json.topic}}",
+            "Generated Titles": "={{$node[\"Basic LLM Chain\"].json.output}}",
+            "Date": "={{new Date().toISOString()}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Generated Titles",
+              "displayName": "Generated Titles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1200,
+        0
+      ],
+      "id": "b709db81-7f85-44e1-8714-ef3ca244185b",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "JBIvTm5GO4C1oBff",
+          "name": "Google Service Account account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ebfb0584-86b9-49af-926d-11eaa3e76602",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "34a7d84d75b626d0798a75e8743058654b8ad36cfcdd287dd96ebe61a4670770"
+  },
+  "nodeGroups": [],
+  "id": "si0Zwydn5wllBJK8",
+  "tags": []
+}
